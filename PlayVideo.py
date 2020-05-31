@@ -6,6 +6,11 @@ from sklearn.decomposition import PCA
 import numpy as np
 import cv2
 import colorsys
+
+#something just to actually play the video
+#something that just shows the plot
+#something that saves out plots
+#something that overlays the pngs onto the video
 out = cv2.VideoWriter('project.avi',cv2.VideoWriter_fourcc(*'DIVX'), 60, (1920,1080))
 #cap = cv2.VideoCapture('E:\\Stepmania\\StepMania 5\\Songs\\AT-cm_730561477.mp4')
 cap = cv2.VideoCapture('videos/vid.mp4')
@@ -17,9 +22,10 @@ time_start = 0
 time_end = 0
 hsv_arr = []
 hsv_arr_background = []
-trans_times = [[0,230],[230,260],[260,660],[660,740]]
-trans_dests = [[[232,865],[232,865]],[[232,865],[232,857]],[[232,857],[232,857]],[[232,857+3],[171,845+3]]]
-
+# trans_times = [[0,230],[230,260],[260,660],[660,740]]
+# trans_dests = [[[232,865],[232,865]],[[232,865],[232,857]],[[232,857],[232,857]],[[232,857+3],[171,845+3]]]
+trans_times = [-1,230,260,660,740]
+trans_dests = [[232,865],[232,865],[232,857],[232,857],[171,845+3]]
 
 
 def get_hsv_from_coords():
@@ -65,33 +71,14 @@ while(cap.isOpened()):
         break
     index = -1
     for i in range(len(trans_times)):
-        if(trans_times[i][1]<frame_count):
+        if(trans_times[i]<frame_count):
             continue
         else:
-            current_interval = trans_times[i]
+            current_interval = [trans_times[i-1],trans_times[i]]
             index = i
             break
-    current_interval_dest = trans_dests[index]
-    # gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-#202,849
-    #246,870
-    # frame[ 849:870,202:246, :]*=0
-    #"171,845"
-    # width = 30
-    # height = 20
-    # center_y = 857
-    # center_x = 232
-    # if(frame_count>660):
-    #     #"171,845"
-    #     count=np.min([frame_count,740])
-    #     time_passed = count-660
-    #     center_y+=time_passed*(845-center_y)/(740-660)
-    #     center_x+=time_passed*(171-center_x)/(740-660)
-    #     center_y=int(center_y+.5)
-    #     center_x=int(center_x+.5)
-    # get_hsv_from_coords()
-    # hsv_arr.append(hsv)
-    # mean = hsv[0]
+    current_interval_dest = [trans_dests[index-1],trans_dests[index]]
+
     width = 24
     height = 20
     if(index!=-1):
@@ -117,8 +104,8 @@ while(cap.isOpened()):
     else:
         print("frame count")
         print(frame_count)
-        center_y = trans_dests[-1][1][1]
-        center_x = trans_dests[-1][1][0]
+        center_y = trans_dests[-1][1]
+        center_x = trans_dests[-1][0]
 
         # center_x = (1-percent_through_interval)*current_interval[0] + percent_through_interval*current_interval[1]
 
