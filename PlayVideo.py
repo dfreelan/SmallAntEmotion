@@ -66,6 +66,7 @@ while(cap.isOpened()):
     if(frame_count<60*1):
         time_start = time.time()
         continue
+    # if(frame_count>60*3):
     if(frame_count>845+60*4):
         time_end = time.time()
         break
@@ -175,7 +176,7 @@ transformed = np.add(transformed,-1*np.min(transformed)+1)
 transformed = np.log(transformed)
 print("shape of transformed " + str(np.shape(transformed)))
 scatter = ax2.scatter(x=scatter_x, y=np.squeeze(transformed[ : , :1]),
-                     picker=True, s=1)
+                     picker=True, c='r',s=5)
 plt.show()
 
 pca = PCA(1)
@@ -184,6 +185,50 @@ pca.fit(hsv_arr)
 scatter_x_all  = scatter_x.copy()
 scatter_y_all  = scatter_y.copy()
 hsv_arr_all = hsv_arr.copy()
+
+
+pca_background = PCA(1)
+print("shape of hsv_arr {}".format(np.shape(hsv_arr_background)))
+pca_background.fit(hsv_arr_background)
+scatter_x_all_background = scatter_x.copy()
+scatter_y_all_background = hsv_arr_background.copy()
+hsv_arr_all_background = hsv_arr_background.copy()
+for i in range(2,len(scatter_x_all)):
+    scatter_x=scatter_x_all_background[:i]
+    scatter_y=scatter_y_all_background[:i]
+    hsv=hsv_arr_all_background[:i]
+    fig, ax = plt.subplots()
+    ax.set_ylabel('Hue')
+    ax.set_xlabel('Time in frames')
+    ax.set_title('CONTROL: Background hue over time')
+
+    print(time_start-time_end)
+
+    transformed = pca_background.transform(hsv)
+    transformed = np.add(transformed,-1*np.min(transformed)+1)
+    transformed = np.log(transformed)
+    print("shape of transformed " + str(np.shape(transformed)))
+    scatter = ax.scatter(x=scatter_x, y=np.squeeze(transformed[ : , :1]),
+                         picker=True, s=1,c='g',label="BOTW background")
+    scatter_x = scatter_x_all[:i]
+    scatter_y = scatter_y[:i]
+    hsv = hsv_arr_all[:i]
+    # ax.set_ylabel('Hue')
+    # ax.set_xlabel('Time in frames')
+    # ax.set_title('Smallant\'s hue over time')
+
+    print(time_start - time_end)
+
+    transformed = pca.transform(hsv)
+    transformed = np.add(transformed, -1 * np.min(transformed) + 1)
+    transformed = np.log(transformed)
+    print("shape of transformed " + str(np.shape(transformed)))
+    scatter2 = ax.scatter(x=scatter_x,  y=np.squeeze(transformed[:, :1]),
+                         picker=True, s=1, c='r',label="smallant")
+    fig.savefig('pngs/plot_background'+str(i)+'.png')
+    plt.close("all")
+
+
 for i in range(2,len(scatter_x_all)):
     scatter_x=scatter_x_all[:i]
     scatter_y=scatter_y[:i]
@@ -200,34 +245,7 @@ for i in range(2,len(scatter_x_all)):
     transformed = np.log(transformed)
     print("shape of transformed " + str(np.shape(transformed)))
     scatter = ax.scatter(x=scatter_x, y=np.squeeze(transformed[ : , :1]),
-                         picker=True, s=1)
+                         picker=True, c='r', s=5)
 
     fig.savefig('pngs/plot'+str(i)+'.png')
-    plt.close("all")
-
-pca = PCA(1)
-print("shape of hsv_arr {}".format(np.shape(hsv_arr_background)))
-pca.fit(hsv_arr_background)
-scatter_x_all  = scatter_x.copy()
-scatter_y_all  = hsv_arr_background.copy()
-hsv_arr_all = hsv_arr_background.copy()
-for i in range(2,len(scatter_x_all)):
-    scatter_x=scatter_x_all[:i]
-    scatter_y=scatter_y[:i]
-    hsv=hsv_arr_all[:i]
-    fig, ax = plt.subplots()
-    ax.set_ylabel('Hue')
-    ax.set_xlabel('Time in frames')
-    ax.set_title('CONTROL: Background hue over time')
-
-    print(time_start-time_end)
-
-    transformed = pca.transform(hsv)
-    transformed = np.add(transformed,-1*np.min(transformed)+1)
-    transformed = np.log(transformed)
-    print("shape of transformed " + str(np.shape(transformed)))
-    scatter = ax.scatter(x=scatter_x, y=np.squeeze(transformed[ : , :1]),
-                         picker=True, s=1)
-
-    fig.savefig('pngs/plot_background'+str(i)+'.png')
     plt.close("all")
